@@ -1,8 +1,10 @@
 package com.example.RealEstate.controller;
 
 import com.example.RealEstate.domain.Message;
+import com.example.RealEstate.domain.User;
 import com.example.RealEstate.repo.MessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +18,7 @@ public class MainController {
     private MessageRepo messageRepo;
 
     @GetMapping("/")
-    public String greeting(Map<String, Object> model) {
+    public String index(Map<String, Object> model) {
         return "index";
     }
 
@@ -30,8 +32,13 @@ public class MainController {
     }
 
     @PostMapping("/main")
-    public String add(@RequestParam String text, @RequestParam String tag, Map<String, Object> model) {
-        Message message = new Message(text, tag);
+    public String add(
+            @AuthenticationPrincipal User user,
+            @RequestParam String text,
+            @RequestParam String tag,
+            Map<String, Object> model
+    ){
+        Message message = new Message(text, tag, user);
 
         messageRepo.save(message);
 
@@ -41,6 +48,11 @@ public class MainController {
 
         return "main";
     }
+
+//    @PostMapping("delete")
+//    public String delete(@RequestParam String delete, Map<String, Object> model){
+//
+//    }
 
     @PostMapping("filter")
     public String filter(@RequestParam String filter, Map<String, Object> model) {
