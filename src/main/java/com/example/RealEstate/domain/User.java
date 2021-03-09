@@ -1,6 +1,7 @@
 package com.example.RealEstate.domain;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "usr")
@@ -11,6 +12,14 @@ public class User {
     private Long id;
     private String username;
     private String password;
+    @Transient
+    private String passwordConfirm;
+    private boolean active;
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
 
     public User() {
     }
@@ -31,6 +40,7 @@ public class User {
         this.username = username;
     }
 
+
     public String getPassword() {
         return password;
     }
@@ -38,4 +48,30 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
+
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public Set<Role> setRoles(Set<Role> roles) {
+        this.roles = roles;
+        return roles;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
 }
