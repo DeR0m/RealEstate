@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -16,35 +17,38 @@ public class UserService {
     private UserRepo userRepo;
 
 
-   public User registration(User user) throws UserAlreadyExistException {
+    public User registration(User user) throws UserAlreadyExistException {
 
-       if(userRepo.findByUsername(user.getUsername()) != null){
-           throw new UserAlreadyExistException("Пользователь с таким именем существует");
-       }
+        if (userRepo.findByUsername(user.getUsername()) != null) {
+            throw new UserAlreadyExistException("Пользователь с таким именем существует");
+        }
 
-       user.setActive(true);
-       user.setRoles(user.setRoles(Collections.singleton(Role.USER)));
-//       userRepo.save(user);
+        user.setActive(true);
+        user.setRoles(user.setRoles(Collections.singleton(Role.USER)));
 
+        return userRepo.save(user);
+    }
 
-       return userRepo.save(user);
-   }
+    public List<User> getUsers(User user) throws UserNotFoundException {
 
+        if (user == null) {
+            throw new UserNotFoundException("Пользователи не найдены");
+        }
+        return userRepo.findAll();
+    }
 
-
-
-   public User getOne(Long id) throws UserNotFoundException {
+    public User getOne(Long id) throws UserNotFoundException {
         User user = userRepo.findById(id).get();
-        if(user == null){
+        if (user == null) {
             throw new UserNotFoundException("Пользователь не найден");
         }
         return user;
-   }
+    }
 
-   public Long delete(Long id){
-       userRepo.deleteById(id);
-       return id;
-   }
+    public Long delete(Long id) {
+        userRepo.deleteById(id);
+        return id;
+    }
 
 
 }
