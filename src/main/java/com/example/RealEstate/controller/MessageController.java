@@ -1,84 +1,70 @@
 package com.example.RealEstate.controller;
 
 import com.example.RealEstate.domain.Message;
-import com.example.RealEstate.repo.MessageRepo;
-import org.springframework.beans.BeanUtils;
+import com.example.RealEstate.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("message")
 public class MessageController {
-    private final MessageRepo messageRepo;
-
-    @Value("${upload.path}")
-    private String uploadPath;
-
     @Autowired
-    public MessageController(MessageRepo messageRepo) {
-        this.messageRepo = messageRepo;
-    }
+    private MessageService messageService;
 
     @GetMapping
-    public List<Message> list() {
-        return messageRepo.findAll();
+    public ResponseEntity getMessages() {
+        try{
+            return ResponseEntity.ok(messageService.getMessages());
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Произошла ошибка");
+        }
     }
 
     @GetMapping("{id}")
-    public Message getOne(@PathVariable("id") Message message) {
-        return message;
+    public ResponseEntity getOne(@PathVariable Long id) {
+        try{
+            return ResponseEntity.ok(messageService.getOneMessage(id));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Произошла ошибка");
+        }
     }
 
-
     @PostMapping
-    public String create(
+    public ResponseEntity create(
             @Valid Message message,
             @RequestParam("file") List<MultipartFile> multiPartFileList
-    ) throws IOException {
-
-        for(MultipartFile file : multiPartFileList) {
-
-            if (file != null && !file.getOriginalFilename().isEmpty()) {
-                File uploadDir = new File(uploadPath);
-
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdir();
-                }
-
-                String uuidFile = UUID.randomUUID().toString();
-                String resultFilename = uuidFile + "." + file.getOriginalFilename();
-
-                file.transferTo(new File(uploadPath + "/" + resultFilename));
-
-                message.setFilename(message.setFilename(Collections.singleton(resultFilename)));
-
-            }
-
+    ){
+        try{
+            messageService.create(message, multiPartFileList);
+            return ResponseEntity.ok("Пост сделан");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Произошла ошибка");
         }
-
-        return "e";
     }
 
     @PutMapping("{id}")
-    public Message update(
+    public ResponseEntity update(
             @PathVariable("id") Message messageFromDb,
             @RequestBody Message message) {
-        BeanUtils.copyProperties(message, messageFromDb, "id");
-
-        return messageRepo.save(messageFromDb);
+        try{
+            messageService.update(messageFromDb, message);
+            return ResponseEntity.ok("Пост обнавлен");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Произошла ошибка");
+        }
     }
 
     @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Message message) {
-        messageRepo.delete(message);
+    public ResponseEntity delete(@PathVariable Long id) {
+        try{
+            return ResponseEntity.ok(messageService.delete(id));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Произошла ошибка");
+        }
     }
 }
