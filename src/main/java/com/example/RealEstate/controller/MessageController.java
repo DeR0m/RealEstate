@@ -34,6 +34,15 @@ public class MessageController {
         }
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity filter(@RequestParam(required = false, defaultValue = "") String filter ){
+        try{
+            return ResponseEntity.ok(messageService.filter(filter));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Произошла ошибка");
+        }
+    }
+
     @PostMapping
     public ResponseEntity create(
             @Valid Message message,

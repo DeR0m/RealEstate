@@ -15,6 +15,7 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String text;
+    private String tag;
 
     @ElementCollection
     private Set<String> filename;
@@ -27,14 +28,22 @@ public class Message {
         this.text = text;
     }
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
     public Set<String> getFilename() {
         return filename;
     }
 
-    public Set<String> setFilename(Set<String> filename) {
+    public void setFilename(Set<String> filename) {
         this.filename = filename;
-        return filename;
     }
+
 
     public Long getId() {
         return id;
