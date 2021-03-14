@@ -10,9 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class MessageService {
@@ -50,6 +48,8 @@ public class MessageService {
             List<MultipartFile> multiPartFileList
     ) throws IOException {
 
+        Set<String> resultFilename = new HashSet<>();
+
         for(MultipartFile file : multiPartFileList) {
 
 
@@ -61,21 +61,18 @@ public class MessageService {
                 }
 
                 String uuidFile = UUID.randomUUID().toString();
-                String resultFilename = (uuidFile + "." + file.getOriginalFilename());
-                int k = 0;
+
+                resultFilename.add(uuidFile + "." + file.getOriginalFilename());
 
                 file.transferTo(new File(uploadPath + "/" + resultFilename));
-                for (int i = 0; i < multiPartFileList.size(); i++) {
-                    message.setFilename(Collections.singleton(resultFilename));
-
-                }
 
             }
 
-
         }
+        message.setFilename(resultFilename);
 
-        return messageRepo.save(message);
+
+        return  messageRepo.save(message);
     }
 
 
